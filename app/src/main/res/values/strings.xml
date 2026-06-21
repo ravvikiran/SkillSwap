@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SkillSwap</string>
+    <string name="onboarding_welcome_title">Welcome to SkillSwap</string>
+    <string name="onboarding_welcome_subtitle">Exchange skills with your neighbors</string>
+    <string name="onboarding_location_title">Your Neighborhood</string>
+    <string name="onboarding_location_subtitle">We\'ll find skilled neighbors near you</string>
+    <string name="onboarding_skills_title">Your Skills</string>
+    <string name="onboarding_skills_subtitle">What can you offer? What do you need?</string>
+    <string name="sign_in_google">Continue with Google</string>
+    <string name="sign_in_email">Continue with Email</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_discover">Discover</string>
+    <string name="nav_messages">Messages</string>
+    <string name="nav_wallet">Wallet</string>
+    <string name="nav_profile">Profile</string>
+</resources>
