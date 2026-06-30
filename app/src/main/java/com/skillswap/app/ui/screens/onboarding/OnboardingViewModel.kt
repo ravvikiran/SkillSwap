@@ -119,15 +119,23 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
-    fun saveLocation() {
+    fun saveLocation(onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             val userId = authRepository.currentUserId ?: return@launch
             val state = _locationState.value
             val location = state.location ?: return@launch
 
             _locationState.update { it.copy(isLoading = true) }
-            userRepository.updateLocation(userId, location, state.neighborhood)
+            val result = userRepository.updateLocation(userId, location, state.neighborhood)
             _locationState.update { it.copy(isLoading = false) }
+            result.fold(
+                onSuccess = { onSuccess?.invoke() },
+                onFailure = { e ->
+                    _locationState.update {
+                        it.copy(errorMessage = "Failed to save location. Please try again.")
+                    }
+                }
+            )
         }
     }
 
@@ -204,12 +212,19 @@ class OnboardingViewModel @Inject constructor(
             _skillsState.update { it.copy(isLoading = true) }
 
             val state = _skillsState.value
-            userRepository.updateSkillsOffered(userId, state.skillsOffered)
-            userRepository.updateSkillsNeeded(userId, state.skillsNeeded)
-            userRepository.completeOnboarding(userId)
+            val offeredResult = userRepository.updateSkillsOffered(userId, state.skillsOffered)
+            val neededResult = userRepository.updateSkillsNeeded(userId, state.skillsNeeded)
+            val completeResult = userRepository.completeOnboarding(userId)
 
             _skillsState.update { it.copy(isLoading = false) }
-            onComplete()
+
+            if (offeredResult.isSuccess && neededResult.isSuccess && completeResult.isSuccess) {
+                onComplete()
+            } else {
+                _skillsState.update {
+                    it.copy(errorMessage = "Something went wrong. Please try again.")
+                }
+            }
         }
     }
 }

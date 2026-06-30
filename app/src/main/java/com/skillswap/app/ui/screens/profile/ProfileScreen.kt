@@ -29,7 +29,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -55,26 +54,22 @@ fun ProfileScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Profile") },
-                actions = {
-                    IconButton(onClick = onEditProfile) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit profile")
-                    }
-                    IconButton(onClick = { viewModel.signOut(onSignOut) }) {
-                        Icon(Icons.Default.Logout, contentDescription = "Sign out")
-                    }
+    Column(modifier = Modifier.fillMaxSize()) {
+        TopAppBar(
+            title = { Text("Profile") },
+            actions = {
+                IconButton(onClick = onEditProfile) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit profile")
                 }
-            )
-        }
-    ) { paddingValues ->
+                IconButton(onClick = { viewModel.signOut(onSignOut) }) {
+                    Icon(Icons.Default.Logout, contentDescription = "Sign out")
+                }
+            }
+        )
+
         if (state.isLoading) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -84,7 +79,6 @@ fun ProfileScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
                         .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -209,9 +203,7 @@ fun ProfileScreen(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                             )
                         ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = "Skills I Offer",
                                     style = MaterialTheme.typography.titleSmall,
@@ -243,9 +235,7 @@ fun ProfileScreen(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                             )
                         ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
                                 Text(
                                     text = "Skills I Want to Learn",
                                     style = MaterialTheme.typography.titleSmall,

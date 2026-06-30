@@ -213,8 +213,7 @@ fun LocationSetupScreen(
             // Continue button
             Button(
                 onClick = {
-                    viewModel.saveLocation()
-                    onContinue()
+                    viewModel.saveLocation { onContinue() }
                 },
                 enabled = state.isLocationSet && !state.isLoading,
                 modifier = Modifier

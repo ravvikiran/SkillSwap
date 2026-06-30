@@ -31,29 +31,34 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val viewModel: MainViewModel = hiltViewModel()
+            val authState by viewModel.authState.collectAsState()
+
+            // Keep splash screen visible while loading auth state
+            splashScreen.setKeepOnScreenCondition { authState.isLoading }
+
             SkillSwapTheme {
-                SkillSwapApp()
+                if (!authState.isLoading) {
+                    SkillSwapApp(authState = authState)
+                }
             }
         }
     }
 }
 
 @Composable
-fun SkillSwapApp(
-    viewModel: MainViewModel = hiltViewModel()
-) {
+fun SkillSwapApp(authState: AuthState) {
     val navController = rememberNavController()
-    val authState by viewModel.authState.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     val startDestination = when {
         authState.isAuthenticated && authState.isOnboardingComplete -> NavRoutes.Home.route
-        authState.isAuthenticated -> NavRoutes.LocationSetup.route
+        authState.isAuthenticated -> "onboarding"
         else -> NavRoutes.Welcome.route
     }
 

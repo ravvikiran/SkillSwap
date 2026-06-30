@@ -1,15 +1,19 @@
 package com.skillswap.app.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.skillswap.app.ui.screens.auth.SignInScreen
 import com.skillswap.app.ui.screens.auth.SignUpScreen
 import com.skillswap.app.ui.screens.auth.WelcomeScreen
 import com.skillswap.app.ui.screens.home.HomeScreen
 import com.skillswap.app.ui.screens.onboarding.LocationSetupScreen
+import com.skillswap.app.ui.screens.onboarding.OnboardingViewModel
 import com.skillswap.app.ui.screens.onboarding.SkillsSetupScreen
 import com.skillswap.app.ui.screens.profile.ProfileScreen
 
@@ -30,7 +34,7 @@ fun AppNavGraph(
                 onSignInClick = { navController.navigate(NavRoutes.SignIn.route) },
                 onSignUpClick = { navController.navigate(NavRoutes.SignUp.route) },
                 onGoogleSignIn = {
-                    navController.navigate(NavRoutes.LocationSetup.route) {
+                    navController.navigate("onboarding") {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
                 }
@@ -56,7 +60,7 @@ fun AppNavGraph(
         composable(NavRoutes.SignUp.route) {
             SignUpScreen(
                 onSignUpSuccess = {
-                    navController.navigate(NavRoutes.LocationSetup.route) {
+                    navController.navigate("onboarding") {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
                 },
@@ -69,23 +73,40 @@ fun AppNavGraph(
             )
         }
 
-        // Onboarding flow
-        composable(NavRoutes.LocationSetup.route) {
-            LocationSetupScreen(
-                onContinue = { navController.navigate(NavRoutes.SkillsSetup.route) },
-                onBackClick = { navController.popBackStack() }
-            )
-        }
+        // Onboarding flow — shared ViewModel scoped to this nested nav graph
+        navigation(
+            startDestination = NavRoutes.LocationSetup.route,
+            route = "onboarding"
+        ) {
+            composable(NavRoutes.LocationSetup.route) { entry ->
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry("onboarding")
+                }
+                val viewModel: OnboardingViewModel = hiltViewModel(parentEntry)
 
-        composable(NavRoutes.SkillsSetup.route) {
-            SkillsSetupScreen(
-                onComplete = {
-                    navController.navigate(NavRoutes.Home.route) {
-                        popUpTo(NavRoutes.LocationSetup.route) { inclusive = true }
-                    }
-                },
-                onBackClick = { navController.popBackStack() }
-            )
+                LocationSetupScreen(
+                    onContinue = { navController.navigate(NavRoutes.SkillsSetup.route) },
+                    onBackClick = { navController.popBackStack() },
+                    viewModel = viewModel
+                )
+            }
+
+            composable(NavRoutes.SkillsSetup.route) { entry ->
+                val parentEntry = remember(entry) {
+                    navController.getBackStackEntry("onboarding")
+                }
+                val viewModel: OnboardingViewModel = hiltViewModel(parentEntry)
+
+                SkillsSetupScreen(
+                    onComplete = {
+                        navController.navigate(NavRoutes.Home.route) {
+                            popUpTo("onboarding") { inclusive = true }
+                        }
+                    },
+                    onBackClick = { navController.popBackStack() },
+                    viewModel = viewModel
+                )
+            }
         }
 
         // Main tabs
@@ -94,18 +115,15 @@ fun AppNavGraph(
         }
 
         composable(NavRoutes.Discover.route) {
-            // Placeholder
-            HomeScreen()
+            HomeScreen() // Placeholder
         }
 
         composable(NavRoutes.Messages.route) {
-            // Placeholder
-            HomeScreen()
+            HomeScreen() // Placeholder
         }
 
         composable(NavRoutes.Wallet.route) {
-            // Placeholder
-            HomeScreen()
+            HomeScreen() // Placeholder
         }
 
         composable(NavRoutes.Profile.route) {
@@ -120,7 +138,6 @@ fun AppNavGraph(
         }
 
         composable(NavRoutes.EditProfile.route) {
-            // Placeholder
             ProfileScreen(
                 onEditProfile = {},
                 onSignOut = {}
