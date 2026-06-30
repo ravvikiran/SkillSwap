@@ -6,7 +6,7 @@ import android.location.Geocoder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.skillswap.app.domain.model.GeoPoint
+import com.skillswap.app.domain.model.LatLng
 import com.skillswap.app.domain.repository.LocationRepository
 import com.skillswap.app.domain.repository.LocationSearchResult
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -22,7 +22,7 @@ class LocationRepositoryImpl @Inject constructor(
 ) : LocationRepository {
 
     @SuppressLint("MissingPermission")
-    override suspend fun getCurrentLocation(): Result<GeoPoint> {
+    override suspend fun getCurrentLocation(): Result<LatLng> {
         return try {
             val cancellationToken = CancellationTokenSource()
             val location = fusedLocationClient.getCurrentLocation(
@@ -30,7 +30,7 @@ class LocationRepositoryImpl @Inject constructor(
                 cancellationToken.token
             ).await()
             if (location != null) {
-                Result.success(GeoPoint(location.latitude, location.longitude))
+                Result.success(LatLng(location.latitude, location.longitude))
             } else {
                 Result.failure(Exception("Unable to get current location"))
             }
@@ -40,7 +40,7 @@ class LocationRepositoryImpl @Inject constructor(
     }
 
     @Suppress("DEPRECATION")
-    override suspend fun getNeighborhoodName(location: GeoPoint): Result<String> {
+    override suspend fun getNeighborhoodName(location: LatLng): Result<String> {
         return try {
             val geocoder = Geocoder(context, Locale.getDefault())
             val addresses = geocoder.getFromLocation(
@@ -64,7 +64,7 @@ class LocationRepositoryImpl @Inject constructor(
                 LocationSearchResult(
                     name = address.featureName ?: address.locality ?: query,
                     address = address.getAddressLine(0) ?: "",
-                    location = GeoPoint(address.latitude, address.longitude)
+                    location = LatLng(address.latitude, address.longitude)
                 )
             }
             Result.success(results)

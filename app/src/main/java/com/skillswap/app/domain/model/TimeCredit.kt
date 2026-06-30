@@ -1,5 +1,8 @@
 package com.skillswap.app.domain.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class TimeCredit(
     val id: String = "",
     val userId: String = "",

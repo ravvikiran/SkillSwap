@@ -2,7 +2,7 @@ package com.skillswap.app.ui.screens.onboarding
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.skillswap.app.domain.model.GeoPoint
+import com.skillswap.app.domain.model.LatLng
 import com.skillswap.app.domain.model.Skill
 import com.skillswap.app.domain.model.SkillCategory
 import com.skillswap.app.domain.repository.AuthRepository
@@ -20,7 +20,7 @@ import javax.inject.Inject
 data class LocationUiState(
     val isLoading: Boolean = false,
     val isDetecting: Boolean = false,
-    val location: GeoPoint? = null,
+    val location: LatLng? = null,
     val neighborhood: String = "",
     val searchQuery: String = "",
     val errorMessage: String? = null,

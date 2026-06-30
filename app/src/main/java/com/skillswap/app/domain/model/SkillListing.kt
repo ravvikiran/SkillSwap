@@ -1,5 +1,8 @@
 package com.skillswap.app.domain.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class SkillListing(
     val id: String = "",
     val userId: String = "",
@@ -9,7 +12,7 @@ data class SkillListing(
     val skill: Skill = Skill(),
     val type: ListingType = ListingType.OFFER,
     val description: String = "",
-    val location: GeoPoint? = null,
+    val location: LatLng? = null,
     val neighborhood: String = "",
     val distanceKm: Float? = null,
     val createdAt: Long = System.currentTimeMillis()

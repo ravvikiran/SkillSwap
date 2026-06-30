@@ -101,7 +101,8 @@ fun SkillSwapApp(
     ) { innerPadding ->
         AppNavGraph(
             navController = navController,
-            startDestination = startDestination
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)
         )
     }
 }

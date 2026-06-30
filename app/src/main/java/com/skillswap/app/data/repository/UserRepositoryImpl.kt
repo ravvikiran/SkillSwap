@@ -1,7 +1,7 @@
 package com.skillswap.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.skillswap.app.domain.model.GeoPoint
+import com.skillswap.app.domain.model.LatLng
 import com.skillswap.app.domain.model.Skill
 import com.skillswap.app.domain.model.User
 import com.skillswap.app.domain.repository.UserRepository
@@ -63,7 +63,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun updateLocation(
         userId: String,
-        location: GeoPoint,
+        location: LatLng,
         neighborhood: String
     ): Result<Unit> {
         return try {
@@ -106,9 +106,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getNearbyUsers(location: GeoPoint, radiusKm: Double): Result<List<User>> {
+    override suspend fun getNearbyUsers(location: LatLng, radiusKm: Double): Result<List<User>> {
         return try {
-            // Simple distance-based query (for MVP; consider GeoFire for production)
             val allUsers = usersCollection.get().await()
             val nearbyUsers = allUsers.documents
                 .mapNotNull { it.toObject(User::class.java) }

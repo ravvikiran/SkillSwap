@@ -1,12 +1,15 @@
 package com.skillswap.app.domain.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class User(
     val id: String = "",
     val displayName: String = "",
     val email: String = "",
     val photoUrl: String? = null,
     val neighborhood: String = "",
-    val location: GeoPoint? = null,
+    val location: LatLng? = null,
     val skillsOffered: List<Skill> = emptyList(),
     val skillsNeeded: List<Skill> = emptyList(),
     val bio: String = "",
@@ -17,11 +20,13 @@ data class User(
     val isOnboardingComplete: Boolean = false
 )
 
-data class GeoPoint(
+@Keep
+data class LatLng(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0
 )
 
+@Keep
 data class Skill(
     val id: String = "",
     val name: String = "",

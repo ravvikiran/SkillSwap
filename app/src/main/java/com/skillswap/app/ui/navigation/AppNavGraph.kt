@@ -1,6 +1,7 @@
 package com.skillswap.app.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,11 +16,13 @@ import com.skillswap.app.ui.screens.profile.ProfileScreen
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String
+    startDestination: String,
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         // Auth flow
         composable(NavRoutes.Welcome.route) {
