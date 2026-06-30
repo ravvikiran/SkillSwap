@@ -6,9 +6,11 @@ import com.skillswap.app.domain.model.User
 import com.skillswap.app.domain.repository.AuthRepository
 import com.skillswap.app.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,22 +30,37 @@ class ProfileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
+    private var observeJob: Job? = null
+
     init {
         loadProfile()
     }
 
     private fun loadProfile() {
-        viewModelScope.launch {
-            val userId = authRepository.currentUserId ?: return@launch
-            userRepository.observeUser(userId).collect { user ->
-                _uiState.update {
-                    it.copy(isLoading = false, user = user)
+        val userId = authRepository.currentUserId
+        if (userId == null) {
+            _uiState.update { it.copy(isLoading = false, user = null) }
+            return
+        }
+
+        observeJob?.cancel()
+        observeJob = viewModelScope.launch {
+            userRepository.observeUser(userId)
+                .catch { e ->
+                    _uiState.update {
+                        it.copy(isLoading = false, errorMessage = e.message)
+                    }
                 }
-            }
+                .collect { user ->
+                    _uiState.update {
+                        it.copy(isLoading = false, user = user)
+                    }
+                }
         }
     }
 
     fun signOut(onComplete: () -> Unit) {
+        observeJob?.cancel()
         viewModelScope.launch {
             authRepository.signOut()
             onComplete()

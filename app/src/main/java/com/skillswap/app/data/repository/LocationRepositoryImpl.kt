@@ -24,15 +24,19 @@ class LocationRepositoryImpl @Inject constructor(
     @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Result<LatLng> {
         return try {
-            val cancellationToken = CancellationTokenSource()
-            val location = fusedLocationClient.getCurrentLocation(
-                Priority.PRIORITY_HIGH_ACCURACY,
-                cancellationToken.token
-            ).await()
-            if (location != null) {
-                Result.success(LatLng(location.latitude, location.longitude))
-            } else {
-                Result.failure(Exception("Unable to get current location"))
+            val cancellationTokenSource = CancellationTokenSource()
+            try {
+                val location = fusedLocationClient.getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    cancellationTokenSource.token
+                ).await()
+                if (location != null) {
+                    Result.success(LatLng(location.latitude, location.longitude))
+                } else {
+                    Result.failure(Exception("Unable to get current location"))
+                }
+            } finally {
+                cancellationTokenSource.cancel()
             }
         } catch (e: Exception) {
             Result.failure(e)

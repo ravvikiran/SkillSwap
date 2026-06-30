@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,24 +33,32 @@ class MainViewModel @Inject constructor(
 
     private fun observeAuth() {
         viewModelScope.launch {
-            authRepository.observeAuthState().collect { isAuthenticated ->
-                if (isAuthenticated) {
-                    val userId = authRepository.currentUserId ?: return@collect
-                    val userResult = userRepository.getUser(userId)
-                    val user = userResult.getOrNull()
-                    _authState.value = AuthState(
-                        isLoading = false,
-                        isAuthenticated = true,
-                        isOnboardingComplete = user?.isOnboardingComplete ?: false
-                    )
-                } else {
+            authRepository.observeAuthState()
+                .catch {
                     _authState.value = AuthState(
                         isLoading = false,
                         isAuthenticated = false,
                         isOnboardingComplete = false
                     )
                 }
-            }
+                .collect { isAuthenticated ->
+                    if (isAuthenticated) {
+                        val userId = authRepository.currentUserId ?: return@collect
+                        val userResult = userRepository.getUser(userId)
+                        val user = userResult.getOrNull()
+                        _authState.value = AuthState(
+                            isLoading = false,
+                            isAuthenticated = true,
+                            isOnboardingComplete = user?.isOnboardingComplete ?: false
+                        )
+                    } else {
+                        _authState.value = AuthState(
+                            isLoading = false,
+                            isAuthenticated = false,
+                            isOnboardingComplete = false
+                        )
+                    }
+                }
         }
     }
 }
