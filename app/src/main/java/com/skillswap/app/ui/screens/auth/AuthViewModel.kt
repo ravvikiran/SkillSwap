@@ -19,7 +19,8 @@ data class AuthUiState(
     val displayName: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isSignedIn: Boolean = false
+    val isSignedIn: Boolean = false,
+    val isNewUser: Boolean = false
 )
 
 @HiltViewModel
@@ -48,8 +49,11 @@ class AuthViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val result = authRepository.signInWithEmail(_uiState.value.email, _uiState.value.password)
             result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, isSignedIn = true) }
+                onSuccess = { user ->
+                    // Check if user has completed onboarding
+                    val existingUser = userRepository.getUser(user.id).getOrNull()
+                    val needsOnboarding = existingUser?.isOnboardingComplete != true
+                    _uiState.update { it.copy(isLoading = false, isSignedIn = true, isNewUser = needsOnboarding) }
                 },
                 onFailure = { error ->
                     _uiState.update {
@@ -69,7 +73,7 @@ class AuthViewModel @Inject constructor(
                 onSuccess = { user ->
                     // Create user document in Firestore
                     userRepository.createUser(user)
-                    _uiState.update { it.copy(isLoading = false, isSignedIn = true) }
+                    _uiState.update { it.copy(isLoading = false, isSignedIn = true, isNewUser = true) }
                 },
                 onFailure = { error ->
                     _uiState.update {
@@ -90,8 +94,11 @@ class AuthViewModel @Inject constructor(
                     val existingUser = userRepository.getUser(user.id).getOrNull()
                     if (existingUser == null) {
                         userRepository.createUser(user)
+                        _uiState.update { it.copy(isLoading = false, isSignedIn = true, isNewUser = true) }
+                    } else {
+                        val needsOnboarding = !existingUser.isOnboardingComplete
+                        _uiState.update { it.copy(isLoading = false, isSignedIn = true, isNewUser = needsOnboarding) }
                     }
-                    _uiState.update { it.copy(isLoading = false, isSignedIn = true) }
                 },
                 onFailure = { error ->
                     _uiState.update {

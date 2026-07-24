@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -55,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun SignInScreen(
     onSignInSuccess: () -> Unit,
+    onNavigateToOnboarding: () -> Unit,
     onNavigateToSignUp: () -> Unit,
     onBackClick: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
@@ -65,7 +67,13 @@ fun SignInScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSignedIn) {
-        if (uiState.isSignedIn) onSignInSuccess()
+        if (uiState.isSignedIn) {
+            if (uiState.isNewUser) {
+                onNavigateToOnboarding()
+            } else {
+                onSignInSuccess()
+            }
+        }
     }
 
     LaunchedEffect(uiState.errorMessage) {
@@ -181,7 +189,7 @@ fun SignInScreen(
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.height(24.dp),
+                        modifier = Modifier.size(24.dp),
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {

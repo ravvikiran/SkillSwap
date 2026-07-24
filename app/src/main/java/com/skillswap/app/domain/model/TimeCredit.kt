@@ -14,6 +14,7 @@ data class TimeCredit(
     val timestamp: Long = System.currentTimeMillis()
 )
 
+@Keep
 enum class TransactionType {
     EARNED,
     SPENT,

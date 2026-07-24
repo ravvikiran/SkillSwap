@@ -34,6 +34,7 @@ data class Skill(
     val description: String = ""
 )
 
+@Keep
 enum class SkillCategory(val displayName: String) {
     TECHNOLOGY("Technology"),
     LANGUAGES("Languages"),

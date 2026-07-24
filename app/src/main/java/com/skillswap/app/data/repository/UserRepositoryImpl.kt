@@ -23,7 +23,8 @@ class UserRepositoryImpl @Inject constructor(
         val listener = usersCollection.document(userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    close(error)
+                    // Don't close the flow; just emit null so the UI can handle it
+                    trySend(null)
                     return@addSnapshotListener
                 }
                 val user = snapshot?.toObject(User::class.java)

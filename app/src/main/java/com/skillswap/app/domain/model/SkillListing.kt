@@ -18,6 +18,7 @@ data class SkillListing(
     val createdAt: Long = System.currentTimeMillis()
 )
 
+@Keep
 enum class ListingType {
     OFFER,
     NEED

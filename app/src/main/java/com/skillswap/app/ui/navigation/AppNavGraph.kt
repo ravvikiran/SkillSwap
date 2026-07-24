@@ -34,6 +34,8 @@ fun AppNavGraph(
                 onSignInClick = { navController.navigate(NavRoutes.SignIn.route) },
                 onSignUpClick = { navController.navigate(NavRoutes.SignUp.route) },
                 onGoogleSignIn = {
+                    // Google Sign-In is handled by WelcomeScreen itself now
+                    // After sign-in, new users go to onboarding
                     navController.navigate("onboarding") {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
@@ -45,6 +47,11 @@ fun AppNavGraph(
             SignInScreen(
                 onSignInSuccess = {
                     navController.navigate(NavRoutes.Home.route) {
+                        popUpTo(NavRoutes.Welcome.route) { inclusive = true }
+                    }
+                },
+                onNavigateToOnboarding = {
+                    navController.navigate("onboarding") {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
                 },
