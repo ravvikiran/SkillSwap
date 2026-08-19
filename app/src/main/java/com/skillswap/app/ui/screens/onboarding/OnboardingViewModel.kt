@@ -209,11 +209,15 @@ class OnboardingViewModel @Inject constructor(
     fun completeOnboarding(onComplete: () -> Unit) {
         viewModelScope.launch {
             val userId = authRepository.currentUserId ?: return@launch
-            _skillsState.update { it.copy(isLoading = true) }
 
-            val state = _skillsState.value
-            val offeredResult = userRepository.updateSkillsOffered(userId, state.skillsOffered)
-            val neededResult = userRepository.updateSkillsNeeded(userId, state.skillsNeeded)
+            // Capture skills before setting loading state
+            val skillsOffered = _skillsState.value.skillsOffered
+            val skillsNeeded = _skillsState.value.skillsNeeded
+
+            _skillsState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val offeredResult = userRepository.updateSkillsOffered(userId, skillsOffered)
+            val neededResult = userRepository.updateSkillsNeeded(userId, skillsNeeded)
             val completeResult = userRepository.completeOnboarding(userId)
 
             _skillsState.update { it.copy(isLoading = false) }

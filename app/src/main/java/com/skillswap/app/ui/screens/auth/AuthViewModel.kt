@@ -45,9 +45,17 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signInWithEmail() {
+        val email = _uiState.value.email.trim()
+        val password = _uiState.value.password
+
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val result = authRepository.signInWithEmail(_uiState.value.email, _uiState.value.password)
+            val result = authRepository.signInWithEmail(email, password)
             result.fold(
                 onSuccess = { user ->
                     // Check if user has completed onboarding
@@ -65,10 +73,24 @@ class AuthViewModel @Inject constructor(
     }
 
     fun signUpWithEmail() {
+        val state = _uiState.value
+        val email = state.email.trim()
+        val password = state.password
+        val displayName = state.displayName.trim()
+
+        if (displayName.isBlank() || email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
+            return
+        }
+
+        if (password.length < 6) {
+            _uiState.update { it.copy(errorMessage = "Password must be at least 6 characters") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            val state = _uiState.value
-            val result = authRepository.signUpWithEmail(state.email, state.password, state.displayName)
+            val result = authRepository.signUpWithEmail(email, password, displayName)
             result.fold(
                 onSuccess = { user ->
                     // Create user document in Firestore

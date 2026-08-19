@@ -34,11 +34,9 @@ fun AppNavGraph(
                 onSignInClick = { navController.navigate(NavRoutes.SignIn.route) },
                 onSignUpClick = { navController.navigate(NavRoutes.SignUp.route) },
                 onGoogleSignIn = {
-                    // Google Sign-In is handled by WelcomeScreen itself now
-                    // After sign-in, new users go to onboarding
-                    navController.navigate("onboarding") {
-                        popUpTo(NavRoutes.Welcome.route) { inclusive = true }
-                    }
+                    // TODO: Implement Google Sign-In with Credential Manager
+                    // For now, navigate to sign-in screen as fallback
+                    navController.navigate(NavRoutes.SignIn.route)
                 }
             )
         }
@@ -93,7 +91,11 @@ fun AppNavGraph(
 
                 LocationSetupScreen(
                     onContinue = { navController.navigate(NavRoutes.SkillsSetup.route) },
-                    onBackClick = { navController.popBackStack() },
+                    onBackClick = {
+                        navController.navigate(NavRoutes.Welcome.route) {
+                            popUpTo("onboarding") { inclusive = true }
+                        }
+                    },
                     viewModel = viewModel
                 )
             }

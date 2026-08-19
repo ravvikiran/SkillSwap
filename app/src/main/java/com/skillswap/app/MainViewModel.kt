@@ -43,14 +43,32 @@ class MainViewModel @Inject constructor(
                 }
                 .collect { isAuthenticated ->
                     if (isAuthenticated) {
-                        val userId = authRepository.currentUserId ?: return@collect
-                        val userResult = userRepository.getUser(userId)
-                        val user = userResult.getOrNull()
-                        _authState.value = AuthState(
-                            isLoading = false,
-                            isAuthenticated = true,
-                            isOnboardingComplete = user?.isOnboardingComplete ?: false
-                        )
+                        val userId = authRepository.currentUserId
+                        if (userId == null) {
+                            _authState.value = AuthState(
+                                isLoading = false,
+                                isAuthenticated = false,
+                                isOnboardingComplete = false
+                            )
+                            return@collect
+                        }
+                        try {
+                            val userResult = userRepository.getUser(userId)
+                            val user = userResult.getOrNull()
+                            _authState.value = AuthState(
+                                isLoading = false,
+                                isAuthenticated = true,
+                                isOnboardingComplete = user?.isOnboardingComplete ?: false
+                            )
+                        } catch (e: Exception) {
+                            // If we can't fetch user data, still mark as authenticated
+                            // but assume onboarding is incomplete to be safe
+                            _authState.value = AuthState(
+                                isLoading = false,
+                                isAuthenticated = true,
+                                isOnboardingComplete = false
+                            )
+                        }
                     } else {
                         _authState.value = AuthState(
                             isLoading = false,

@@ -109,6 +109,8 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getNearbyUsers(location: LatLng, radiusKm: Double): Result<List<User>> {
         return try {
+            // Note: For production, consider using GeoHash-based queries or a
+            // server-side solution to avoid fetching all users.
             val allUsers = usersCollection.get().await()
             val nearbyUsers = allUsers.documents
                 .mapNotNull { it.toObject(User::class.java) }
@@ -133,10 +135,10 @@ class UserRepositoryImpl @Inject constructor(
         val r = 6371.0 // Earth radius in km
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
-        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        val a = kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
+                kotlin.math.cos(Math.toRadians(lat1)) * kotlin.math.cos(Math.toRadians(lat2)) *
+                kotlin.math.sin(dLon / 2) * kotlin.math.sin(dLon / 2)
+        val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
         return r * c
     }
 }

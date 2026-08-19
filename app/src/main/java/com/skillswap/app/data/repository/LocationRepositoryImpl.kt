@@ -10,7 +10,9 @@ import com.skillswap.app.domain.model.LatLng
 import com.skillswap.app.domain.repository.LocationRepository
 import com.skillswap.app.domain.repository.LocationSearchResult
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -45,35 +47,39 @@ class LocationRepositoryImpl @Inject constructor(
 
     @Suppress("DEPRECATION")
     override suspend fun getNeighborhoodName(location: LatLng): Result<String> {
-        return try {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(
-                location.latitude, location.longitude, 1
-            )
-            val neighborhood = addresses?.firstOrNull()?.let { address ->
-                address.subLocality ?: address.locality ?: address.subAdminArea ?: "Unknown"
-            } ?: "Unknown"
-            Result.success(neighborhood)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return withContext(Dispatchers.IO) {
+            try {
+                val geocoder = Geocoder(context, Locale.getDefault())
+                val addresses = geocoder.getFromLocation(
+                    location.latitude, location.longitude, 1
+                )
+                val neighborhood = addresses?.firstOrNull()?.let { address ->
+                    address.subLocality ?: address.locality ?: address.subAdminArea ?: "Unknown"
+                } ?: "Unknown"
+                Result.success(neighborhood)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
 
     @Suppress("DEPRECATION")
     override suspend fun searchLocation(query: String): Result<List<LocationSearchResult>> {
-        return try {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocationName(query, 5) ?: emptyList()
-            val results = addresses.map { address ->
-                LocationSearchResult(
-                    name = address.featureName ?: address.locality ?: query,
-                    address = address.getAddressLine(0) ?: "",
-                    location = LatLng(address.latitude, address.longitude)
-                )
+        return withContext(Dispatchers.IO) {
+            try {
+                val geocoder = Geocoder(context, Locale.getDefault())
+                val addresses = geocoder.getFromLocationName(query, 5) ?: emptyList()
+                val results = addresses.map { address ->
+                    LocationSearchResult(
+                        name = address.featureName ?: address.locality ?: query,
+                        address = address.getAddressLine(0) ?: "",
+                        location = LatLng(address.latitude, address.longitude)
+                    )
+                }
+                Result.success(results)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-            Result.success(results)
-        } catch (e: Exception) {
-            Result.failure(e)
         }
     }
 }

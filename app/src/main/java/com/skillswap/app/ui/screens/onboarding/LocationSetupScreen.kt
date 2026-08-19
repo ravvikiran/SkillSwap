@@ -219,9 +219,15 @@ fun LocationSetupScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .padding(bottom = 16.dp)
             ) {
-                Text("Continue")
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text("Continue")
+                }
             }
 
             Spacer(modifier = Modifier.height(32.dp))

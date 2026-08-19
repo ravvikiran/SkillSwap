@@ -2,6 +2,8 @@
 -keepattributes *Annotation*
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
+-keepattributes Signature
+-keepattributes InnerClasses,EnclosingMethod
 
 # Firebase
 -keep class com.google.firebase.** { *; }
@@ -28,6 +30,10 @@
 -keep class dagger.hilt.** { *; }
 -keep class javax.inject.** { *; }
 -keep class * extends dagger.hilt.android.lifecycle.HiltViewModel { *; }
+-keep class * extends androidx.lifecycle.ViewModel { *; }
 
 # Coil
 -dontwarn coil.**
+
+# Keep @Keep annotated classes
+-keep @androidx.annotation.Keep class * { *; }
