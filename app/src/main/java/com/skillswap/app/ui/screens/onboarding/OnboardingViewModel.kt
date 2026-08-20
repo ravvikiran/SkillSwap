@@ -69,7 +69,7 @@ class OnboardingViewModel @Inject constructor(
                         )
                     }
                 },
-                onFailure = { error ->
+                onFailure = { _ ->
                     _locationState.update {
                         it.copy(
                             isDetecting = false,
@@ -130,7 +130,7 @@ class OnboardingViewModel @Inject constructor(
             _locationState.update { it.copy(isLoading = false) }
             result.fold(
                 onSuccess = { onSuccess?.invoke() },
-                onFailure = { e ->
+                onFailure = { _ ->
                     _locationState.update {
                         it.copy(errorMessage = "Failed to save location. Please try again.")
                     }
@@ -217,12 +217,25 @@ class OnboardingViewModel @Inject constructor(
             _skillsState.update { it.copy(isLoading = true, errorMessage = null) }
 
             val offeredResult = userRepository.updateSkillsOffered(userId, skillsOffered)
-            val neededResult = userRepository.updateSkillsNeeded(userId, skillsNeeded)
-            val completeResult = userRepository.completeOnboarding(userId)
+            if (offeredResult.isFailure) {
+                _skillsState.update {
+                    it.copy(isLoading = false, errorMessage = "Failed to save offered skills. Please try again.")
+                }
+                return@launch
+            }
 
+            val neededResult = userRepository.updateSkillsNeeded(userId, skillsNeeded)
+            if (neededResult.isFailure) {
+                _skillsState.update {
+                    it.copy(isLoading = false, errorMessage = "Failed to save needed skills. Please try again.")
+                }
+                return@launch
+            }
+
+            val completeResult = userRepository.completeOnboarding(userId)
             _skillsState.update { it.copy(isLoading = false) }
 
-            if (offeredResult.isSuccess && neededResult.isSuccess && completeResult.isSuccess) {
+            if (completeResult.isSuccess) {
                 onComplete()
             } else {
                 _skillsState.update {

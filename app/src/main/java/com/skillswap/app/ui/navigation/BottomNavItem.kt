@@ -1,13 +1,13 @@
 package com.skillswap.app.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
@@ -36,8 +36,8 @@ val bottomNavItems = listOf(
     BottomNavItem(
         route = NavRoutes.Messages.route,
         label = "Messages",
-        selectedIcon = Icons.Filled.Chat,
-        unselectedIcon = Icons.Outlined.Chat
+        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+        unselectedIcon = Icons.AutoMirrored.Outlined.Chat
     ),
     BottomNavItem(
         route = NavRoutes.Wallet.route,

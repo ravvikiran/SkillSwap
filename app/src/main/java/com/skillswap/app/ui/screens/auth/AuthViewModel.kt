@@ -2,7 +2,6 @@ package com.skillswap.app.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.skillswap.app.domain.model.User
 import com.skillswap.app.domain.repository.AuthRepository
 import com.skillswap.app.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,6 +52,11 @@ class AuthViewModel @Inject constructor(
             return
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _uiState.update { it.copy(errorMessage = "Please enter a valid email address") }
+            return
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             val result = authRepository.signInWithEmail(email, password)
@@ -83,6 +87,11 @@ class AuthViewModel @Inject constructor(
             return
         }
 
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _uiState.update { it.copy(errorMessage = "Please enter a valid email address") }
+            return
+        }
+
         if (password.length < 6) {
             _uiState.update { it.copy(errorMessage = "Password must be at least 6 characters") }
             return
@@ -94,7 +103,16 @@ class AuthViewModel @Inject constructor(
             result.fold(
                 onSuccess = { user ->
                     // Create user document in Firestore
-                    userRepository.createUser(user)
+                    val createResult = userRepository.createUser(user)
+                    if (createResult.isFailure) {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "Account created but failed to save profile. Please try signing in."
+                            )
+                        }
+                        return@launch
+                    }
                     _uiState.update { it.copy(isLoading = false, isSignedIn = true, isNewUser = true) }
                 },
                 onFailure = { error ->

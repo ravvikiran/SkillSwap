@@ -17,9 +17,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
@@ -62,7 +62,7 @@ fun ProfileScreen(
                     Icon(Icons.Default.Edit, contentDescription = "Edit profile")
                 }
                 IconButton(onClick = { viewModel.signOut(onSignOut) }) {
-                    Icon(Icons.Default.Logout, contentDescription = "Sign out")
+                    Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = "Sign out")
                 }
             }
         )

@@ -52,23 +52,13 @@ class MainViewModel @Inject constructor(
                             )
                             return@collect
                         }
-                        try {
-                            val userResult = userRepository.getUser(userId)
-                            val user = userResult.getOrNull()
-                            _authState.value = AuthState(
-                                isLoading = false,
-                                isAuthenticated = true,
-                                isOnboardingComplete = user?.isOnboardingComplete ?: false
-                            )
-                        } catch (e: Exception) {
-                            // If we can't fetch user data, still mark as authenticated
-                            // but assume onboarding is incomplete to be safe
-                            _authState.value = AuthState(
-                                isLoading = false,
-                                isAuthenticated = true,
-                                isOnboardingComplete = false
-                            )
-                        }
+                        val userResult = userRepository.getUser(userId)
+                        val user = userResult.getOrNull()
+                        _authState.value = AuthState(
+                            isLoading = false,
+                            isAuthenticated = true,
+                            isOnboardingComplete = user?.isOnboardingComplete ?: false
+                        )
                     } else {
                         _authState.value = AuthState(
                             isLoading = false,

@@ -111,7 +111,12 @@ class UserRepositoryImpl @Inject constructor(
         return try {
             // Note: For production, consider using GeoHash-based queries or a
             // server-side solution to avoid fetching all users.
-            val allUsers = usersCollection.get().await()
+            // Limit query to reduce data transfer.
+            val allUsers = usersCollection
+                .whereEqualTo("isOnboardingComplete", true)
+                .limit(500)
+                .get()
+                .await()
             val nearbyUsers = allUsers.documents
                 .mapNotNull { it.toObject(User::class.java) }
                 .filter { user ->

@@ -52,15 +52,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun SkillSwapApp(authState: AuthState) {
+    val startDestination = when {
+        authState.isAuthenticated && authState.isOnboardingComplete -> NavRoutes.Home.route
+        authState.isAuthenticated -> NavRoutes.Onboarding.route
+        else -> NavRoutes.Welcome.route
+    }
+
+    // Use key to recreate NavHost when the auth-based startDestination changes,
+    // ensuring the correct initial route is always applied.
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-
-    val startDestination = when {
-        authState.isAuthenticated && authState.isOnboardingComplete -> NavRoutes.Home.route
-        authState.isAuthenticated -> "onboarding"
-        else -> NavRoutes.Welcome.route
-    }
 
     val showBottomBar = currentRoute in listOf(
         NavRoutes.Home.route,

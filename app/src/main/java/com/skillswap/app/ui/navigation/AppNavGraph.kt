@@ -49,7 +49,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToOnboarding = {
-                    navController.navigate("onboarding") {
+                    navController.navigate(NavRoutes.Onboarding.route) {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
                 },
@@ -65,7 +65,7 @@ fun AppNavGraph(
         composable(NavRoutes.SignUp.route) {
             SignUpScreen(
                 onSignUpSuccess = {
-                    navController.navigate("onboarding") {
+                    navController.navigate(NavRoutes.Onboarding.route) {
                         popUpTo(NavRoutes.Welcome.route) { inclusive = true }
                     }
                 },
@@ -81,11 +81,11 @@ fun AppNavGraph(
         // Onboarding flow — shared ViewModel scoped to this nested nav graph
         navigation(
             startDestination = NavRoutes.LocationSetup.route,
-            route = "onboarding"
+            route = NavRoutes.Onboarding.route
         ) {
             composable(NavRoutes.LocationSetup.route) { entry ->
                 val parentEntry = remember(entry) {
-                    navController.getBackStackEntry("onboarding")
+                    navController.getBackStackEntry(NavRoutes.Onboarding.route)
                 }
                 val viewModel: OnboardingViewModel = hiltViewModel(parentEntry)
 
@@ -93,7 +93,7 @@ fun AppNavGraph(
                     onContinue = { navController.navigate(NavRoutes.SkillsSetup.route) },
                     onBackClick = {
                         navController.navigate(NavRoutes.Welcome.route) {
-                            popUpTo("onboarding") { inclusive = true }
+                            popUpTo(NavRoutes.Onboarding.route) { inclusive = true }
                         }
                     },
                     viewModel = viewModel
@@ -102,14 +102,14 @@ fun AppNavGraph(
 
             composable(NavRoutes.SkillsSetup.route) { entry ->
                 val parentEntry = remember(entry) {
-                    navController.getBackStackEntry("onboarding")
+                    navController.getBackStackEntry(NavRoutes.Onboarding.route)
                 }
                 val viewModel: OnboardingViewModel = hiltViewModel(parentEntry)
 
                 SkillsSetupScreen(
                     onComplete = {
                         navController.navigate(NavRoutes.Home.route) {
-                            popUpTo("onboarding") { inclusive = true }
+                            popUpTo(NavRoutes.Onboarding.route) { inclusive = true }
                         }
                     },
                     onBackClick = { navController.popBackStack() },
